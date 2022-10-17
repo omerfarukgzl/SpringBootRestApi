@@ -24,6 +24,14 @@ ve Serialzable implement ediyoruz : Bu özellik nesnemiiz networken taşıma vey
 
 
 
+
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+
+
+
+
+
+
 ******************** Katmanlar Arası Mimari ************************
 
                    Client
@@ -92,6 +100,11 @@ Classı ımızın services olduğunu belirtmek için @Services Annotation unu ek
 
 
 
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+
+
+
+
 
 ********************* Katmanlar Arası Bağlantı ************************
 
@@ -135,6 +148,10 @@ aslında .net core daki controller url si ve action url sdir  @RequestMapping(va
 
 
 
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+
+
+
 
 
 ************************ PostMapping Metodu***************************
@@ -174,6 +191,13 @@ Dönüş Tipini SpringFrameworkden gelen ResponseEntity den dönüyoruz Böyleli
      ve daha sonra repository.save fonksiyonuna gönderdik.
 
 
+  @Override
+    public User createUser(User user) {
+        user.setCreateData(new Date());
+        user.setCreatedBy("Admin");
+        return userRepository.save(user);
+    }
+
 ******************Not*****************
 
 services katmanlarında interface olmasının sebebi Controller sınıfınfa services Impl sınıfının Kullanılmasından solayı Dependency Injection uygulanmıştır.
@@ -185,11 +209,25 @@ services katmanlarında interface olmasının sebebi Controller sınıfınfa ser
 
 
 
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+
+
+
+
+
+
 
 ********************** GetMapping Metodu*************************
 
 ******GetAllUsers*********
 localhost:8080/user/getAll  (postman) istek
+
+    @GetMapping(value = "/getAll")
+    public ResponseEntity <List<User>> getUser()
+    {
+        List<User> resultUser=userService.getUsers();
+        return ResponseEntity.ok(resultUser);
+    }
 
 Öncelikle getAllUsers Metdodunu Controller içerisinde tanımladık.İnternetten gelen ilk isteğe cevap verecek olan controller da tanımlanan bu metoda GetMApping(/getAll) url sini verdik.
 getAllUsers Metdounun Generic Tipini List Dönüş Tipini User olarak verdik yani Bize user listesi dönecek.
@@ -200,6 +238,14 @@ Override edilen bu methodun içinde işlem yapmadık çünkü tüm kullanıcıla
 Bu Override edilen methodun dönüşüne Repository katmanı  ile haberleşmesi için userRepository.findAll Hazır Jpa fonksiyonunu kullandık.
 Repositoryden List User tipinde dönen sonucu json formatında geri dönüşünü sağladık.
 
+
+    @Override
+    public List<User> getUsers() {
+        //
+        return userRepository.findAll();
+    }
+
+
 ******GetAllUsers*********
 
 ------------------------------------------
@@ -207,6 +253,13 @@ Repositoryden List User tipinde dönen sonucu json formatında geri dönüşün�
 *********getUser**********
 
 localhost:8080/user/getById/100  (postman) istek
+
+    @GetMapping(value = "/getById/{id}")
+    public ResponseEntity <User> getUser(@PathVariable ("id") Long id)
+    {
+        User resultUser=userService.getUser(id);
+        return ResponseEntity.ok(resultUser);
+    }
 
 Öcelikle getUser methodununu tanımlıyoruz.
 GetMapping özelliğğinde url kısmında @GetMapping(/get{id}) veriyoruz.Çünkü bir kullanıcı getirmek istediğimizde o kullanıcının id si ile ona ulaşırız.
@@ -216,6 +269,16 @@ Daha sonra userServices ınterfacesinde User getUser(Long id) methodunu ve imple
 UserServivesImpl Classında ovveride ettiğimiz bu methodun içinde findById methodunu kullandık. Geriye Optional döner bu nullpointerexeption hatasının düşmesini engelliyor.
 dönen sonuç Optionalde saklandığı için sonucu isPresent() ile kontrol edebiliyoruz.Yani geriye bir değer döndümü dönmdedi mi . Böylece null pointer hatasını engellemiş olduk.
 direk return userRepository.findById(id).get() dediyebilirdik fakat null pointer exeption hatasını engellemek istedik.
+
+    @Override
+     public User getUser(Long id) {
+            Optional <User> user = userRepository.findById(id);
+            if(user.isPresent()) // geriye user döndümü
+            {
+                return user.get();
+            }
+            return null;
+        }
 
 
 *******************Not(OPTIONAL)****************
@@ -236,10 +299,27 @@ Türü İsteğe bağlı olan bir değişkenin kendisi hiçbir zaman boş olmamal
 ********************** GetMapping Metodu*************************
 
 
+
+
+
+
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+
+
+
+
+
 ************************ PutMapping Metodu**************************
 localhost:8080/user/update/100  (postman) istek
 and json format update user
 
+
+    @PutMapping(value = "/update/{id}")
+    public ResponseEntity <User> updateUser(@PathVariable ("id") Long id,@RequestBody User user)
+    {
+        User resultUser=userService.updateUser(id,user);
+        return ResponseEntity.ok(resultUser);
+    }
 
  Öncelikle Controller da updateUser methodunu tanımladık.
  Daha sonra bu methodun @PutMapping Kısmına updateUser{id} ekledik
@@ -269,10 +349,19 @@ and json format update user
 ************************ PutMapping Metodu**************************
 
 
+
+
+
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+
+
+
+
+
 ************************ DeleteMapping Metodu**************************
 localhost:8080/user/delete/100
 
-
+ @DeleteMapping(value = "delete/{id}")
 public ResponseEntity <Boolean> deleteUser(@PathVariable ("id") Long id)
     {
         Boolean resultUser=userService.deleteUser(id);
@@ -298,6 +387,215 @@ public Boolean deleteUser(Long id) {
 
 
 ************************ DeleteMapping Metodu**************************
+
+
+
+
+
+
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+
+
+
+
+
+
+************************ Dto Dönüşümü ve Model Mapper **************************
+
+Biz Entitylerimizi api aracılığıyla direk dış dunyaya açmak istemeyiz. Guvenlik açığı olabilir.
+Bunun yanında entity classlarımızdaki bazı yapılarda clienta gereksiz yere göndermeye gerek yok.
+Modele bir alan daha eklendiği zaman tüm clientlarda değişiklik yapmamak için de kulanılır.
+
+!!! Bizim bazı alanlarımız iç modeli etkileyen alanlardır.Örneğin Şuanki dB de olan createdBy createdAt gibi alanlar bizim daha çok iç modelimizi ilgilendiren alanlar.
+Yani  bu alanları client da göstermeye gerek yok.Bunun için dto gereklidir !!!
+
+
+!!! Model mapper ise bu entity ve dto dönüşümünde kullanılır
+
+Uygulamamızda model mapper ın bir instance ını olusturup bunu her istediğmizde kullanmayı sağlayalıum
+Her kullanmak istediğimizde new lemeyelim bunun için IoC conteiner ında olışan instance ı kullanalım
+Bu configurasyonu yapmak için config paketi içinde ModelMapperConfig classı açıyoruz.
+Bu classın config classı olduğunu belli etmek için @Configuration Annotation ekledik.ve Instance Oluşumu için methoda @Bean annotation u verdik.
+Daha sonra tam eşleşme sağlayarak oluşturduğumuz modelMapper ı geri döndük.
+
+
+
+
+@Configuration
+public class ModelMapperConfig {
+    @Bean
+    public  ModelMapper getModelMapper()
+    {
+        ModelMapper modelMapper= new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        return modelMapper;
+
+    }
+}
+
+
+Yanlızca fisrtname ve lastname alanlarını göstermek istedik ve dtoya bu alanları ekledik.
+Daha sonra @Data Annottaion nu Dto classına atadık.Set Get ToString vb metotların oluşmasını sağladk
+
+
+!!! Artık Controller ve Services Katmanları Dto İle konuşacak. Services ve Repository Entity katmaı ile konuşacak.
+
+? Tüm Controller Daki User Entity  Class Tipini Artık UserDto ile güncelledik.
+
+
+
+
+---------Post Metodu İçin--------------
+
+
+   @PostMapping(value = "/create")
+    public ResponseEntity<UserDto> createUser(@RequestBody UserDto user)
+    {
+        UserDto resultUser=userService.createUser(user);
+        return ResponseEntity.ok(resultUser);
+    }
+
+
+userServicesImpl Classındaki override edilen post metodu için kullanılan createUser methodunun User kısımlarını UserDto ile güncelledik
+Controller - Services Dto
+Services - Repository Entity
+olduğundan dolayı method içerisinde Dto olarak aldığımız parametreyi entitye dönüştürdük.(Model Mapper ile)
+
+    User user = modelMapper.map(userDto,User.class);
+                                        ||
+                                        \/
+    --- Bu dönüşüm işleminin anlamı (UserDto yu User a çevir )= sonucu User user a ata;
+
+    oluşan user entity nesnesidir.
+
+Çünkü Services Repository ile Entity haberleşmesi yapacaktır.
+Model Mapper in kullanılması için ModelMapper Instance oluşturduk.
+
+        private final ModelMapper modelMapper;
+        public UserServicesImpl(ModelMapper modelMapper)
+        {
+            this.modelMapper = modelMapper;
+        }
+
+En sonunda return değerinin bir Dto Olması gerekli çünkü Controlller sınıfındali değişkenimiz Dto değişkeni;
+
+    return ModelMapper(userRepository.save(user),UserDto.Class)
+    --- Bu dönüşümün anlamı (userRepository ile userı kaydet donen user ı UserDto ya çevir)= sonucu return ile dön
+
+
+    @Override
+    public UserDto createUser(UserDto userDto) {
+        User user = modelMapper.map(userDto,User.class);
+        user.setCreateData(new Date());
+        user.setCreatedBy("Admin");
+        return modelMapper.map(userRepository.save(user),UserDto.class);
+    }
+
+
+
+
+---------GetAll Metodu İçin--------------
+
+
+    @GetMapping(value = "/getAll")
+        public ResponseEntity <List<UserDto>> getUser()
+        {
+            List<UserDto> resultUser=userService.getUsers();
+            return ResponseEntity.ok(resultUser);
+        }
+Controller da User kısımlarını UserDto ile güncelledik.Services Interfaccinde ve implement eden class da da güncelledik.
+ UserServicesImpl Classında da öncelikle List <User> user = userRepository.findAll(); işleviyle List tipinde user tutttuk.
+Daha sonra List<UserDto> userDto= users.stream().map(user -> modelMapper.map(users,UserDto.class)).collect(Collectors.toList());
+işleviyle birlikte  stream.map fonskiyonuyla her bir nesneye özgü model mapper dönüşümü yapıyoruz ve işlem sonucunu list olarak dönüyoruz
+ return ile controllera userDto listesini Dönüyoruz.
+
+    @Override
+        public List<UserDto> getUsers() {
+
+            List<User> users = userRepository.findAll();
+            List<UserDto> userDto= users.stream().map(user -> modelMapper.map(users,UserDto.class)).collect(Collectors.toList());
+            return userDto ;
+        }
+
+---------GetUser Metodu İçin--------------
+
+   @GetMapping(value = "/getById/{id}")
+    public ResponseEntity <UserDto> getUser(@PathVariable ("id") Long id)
+    {
+        UserDto resultUser=userService.getUser(id);
+        return ResponseEntity.ok(resultUser);
+    }
+
+ UserServicesImpl Classında repository ile services haberleşmesinden sonra sonuç Optional usera atılır.
+ gerekli kontroller yapıldıktan sonra return olarak Dto ya çevrilmiş hali dönülür
+
+  @Override
+    public UserDto getUser(Long id) {
+        Optional <User> user = userRepository.findById(id);
+        if(user.isPresent()) // geriye user döndümü
+        {
+            return modelMapper.map(user.get(),UserDto.class);
+        }
+        return null;
+    }
+
+
+
+---------UpdateUser Metodu İçin--------------
+
+    @PutMapping(value = "/update/{id}")
+    public ResponseEntity <UserDto> updateUser(@PathVariable ("id") Long id,@RequestBody UserDto userDto)
+    {
+        UserDto resultUser=userService.updateUser(id,userDto);
+        return ResponseEntity.ok(resultUser);
+    }
+
+ UserServicesImpl Classında repository ile services haberleşmesinden sonra sonuç Optional usera atılır.
+ gerekli kontroller yapıldıktan sonra return olarak Dto ya çevrilmiş hali dönülür
+
+UserServicesImpl Classında Optional <User> tipinde kullanıcıyı bulduk.
+daha sonra kontrollerden sonra Dto ile işlemler yaparak return kısmında user nesnesini UserDto ya dönüştürdük ve Controllera gönderdik.
+
+
+
+    @Override
+        public UserDto updateUser(Long id,UserDto userDto) {
+            Optional <User> finduser = userRepository.findById(id);
+            if(finduser.isPresent()) // geriye user döndümü
+            {
+                finduser.get().setFirstname(userDto.getFirstname());
+                finduser.get().setLastname(userDto.getLastname());
+                finduser.get().setUpdateAt(new Date());
+                finduser.get().setUpdateBy("Admin");
+
+                return modelMapper.map(userRepository.save(finduser.get()),UserDto.class);
+            }
+            return null;
+        }
+
+
+
+************************ Dto Dönüşümü ve Model Mapper **************************
+
+
+
+
+
+
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   */

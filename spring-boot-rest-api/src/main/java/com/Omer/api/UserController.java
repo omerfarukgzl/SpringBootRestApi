@@ -1,5 +1,6 @@
 package com.Omer.api;
 
+import com.Omer.dto.UserDto;
 import com.Omer.entity.User;
 import com.Omer.repository.UserRepository;
 import com.Omer.services.UserService;
@@ -16,14 +17,11 @@ import java.util.List;
 //@RequiredArgsConstructor
 public class UserController {
 
-
-
     /*
     private final UserService userService;
     public UserController(UserService userService){
         this.userService=userService;
     }
-
 
     */
     @Autowired
@@ -31,30 +29,30 @@ public class UserController {
 
 
     @PostMapping(value = "/create")
-    public ResponseEntity<User> createUser(@RequestBody User user)
+    public ResponseEntity<UserDto> createUser(@RequestBody UserDto user)
     {
-        User resultUser=userService.createUser(user);
+        UserDto resultUser=userService.createUser(user);
         return ResponseEntity.ok(resultUser);
     }
 
     @GetMapping(value = "/getAll")
-    public ResponseEntity <List<User>> getUser()
+    public ResponseEntity <List<UserDto>> getUser()
     {
-        List<User> resultUser=userService.getUsers();
+        List<UserDto> resultUser=userService.getUsers();
         return ResponseEntity.ok(resultUser);
     }
 
     @GetMapping(value = "/getById/{id}")
-    public ResponseEntity <User> getUser(@PathVariable ("id") Long id)
+    public ResponseEntity <UserDto> getUser(@PathVariable ("id") Long id)
     {
-        User resultUser=userService.getUser(id);
+        UserDto resultUser=userService.getUser(id);
         return ResponseEntity.ok(resultUser);
     }
 
     @PutMapping(value = "/update/{id}")
-    public ResponseEntity <User> updateUser(@PathVariable ("id") Long id,@RequestBody User user)
+    public ResponseEntity <UserDto> updateUser(@PathVariable ("id") Long id,@RequestBody UserDto userDto)
     {
-        User resultUser=userService.updateUser(id,user);
+        UserDto resultUser=userService.updateUser(id,userDto);
         return ResponseEntity.ok(resultUser);
     }
 
