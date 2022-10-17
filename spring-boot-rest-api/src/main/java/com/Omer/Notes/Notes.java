@@ -156,6 +156,13 @@ aslında .net core daki controller url si ve action url sdir  @RequestMapping(va
 
 ************************ PostMapping Metodu***************************
 localhost:8080/user/create  (postman) istek
+
+
+ResponseEntity sınıfı HttpEntity sınıfına ek olarak builder tasarım desenini kullanarak isteğe yanıt olarak header bilgisi,
+HTTP durum kodu gibi bilgileri eklemeyi sağlar.
+Geniş kullanım desteği sunan ResponseEntity REST API işlemlerinde sıklıkla kullanılan durum kodları için özel statik metotlara sahiptir.
+
+
 post seçeneği seçilir
 Body Kısmı seçilir ve json formatında bilgiler yazılır.
     {
@@ -583,6 +590,20 @@ daha sonra kontrollerden sonra Dto ile işlemler yaparak return kısmında user 
 
 
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+
+
+
+
+
+
+
+************************ Server Side Pagination **************************
+
+
+
+
+
+************************ Server Side Pagination **************************
 
 
 
