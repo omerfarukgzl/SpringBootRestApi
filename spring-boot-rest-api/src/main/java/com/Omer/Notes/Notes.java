@@ -513,7 +513,7 @@ işleviyle birlikte  stream.map fonskiyonuyla her bir nesneye özgü model mappe
         public List<UserDto> getUsers() {
 
             List<User> users = userRepository.findAll();
-            List<UserDto> userDto= users.stream().map(user -> modelMapper.map(users,UserDto.class)).collect(Collectors.toList());
+            List<UserDto> userDto= users.stream().map(user -> modelMapper.map(user,UserDto.class)).collect(Collectors.toList());
             return userDto ;
         }
 
