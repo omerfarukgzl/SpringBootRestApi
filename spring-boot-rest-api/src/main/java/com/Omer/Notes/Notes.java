@@ -127,11 +127,19 @@ aslında .net core daki controller url si ve action url sdir  @RequestMapping(va
 
 
 ***************** PostMapping Metodu***********************
+localhost:8080/user/create  (postman) istek
+post seçeneği seçilir
+Body Kısmı seçilir ve json formatında bilgiler yazılır.
+    {
+        "firstname":"Taha",
+        "lastname":"Faruk"
+    }
+
 
 Metodumuzu public olarak tanımlıyoruz çünkü dışarıya açaçcağız.
 Dönüş Tipini SpringFrameworkden gelen ResponseEntity den dönüyoruz Böylelikle metdolarımıza ortak imza oluşturuyoryuz.
 @PostMapping Annotation u ekledik.ve bir path verdik.
-İkinci olarak RequestBody Annotation eklendi. Böylece Json nesnemeizi user classımızla eşeltirmeyi sağlıyoruz.
+İkinci olarak RequestBody Annotation eklendi. Böylece Json formatında gönderilen bilgiyi user nesnesine eşeltirmeyi sağlıyoruz.
     @PostMapping(value = "/create")
     public ResponseEntity<User> createUser(ResponseBody User user)
     {
@@ -155,29 +163,62 @@ Dönüş Tipini SpringFrameworkden gelen ResponseEntity den dönüyoruz Böyleli
      ve daha sonra repository.save fonksiyonuna gönderdik.
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 ******************Not*****************
 
 services katmanlarında interface olmasının sebebi Controller sınıfınfa services Impl sınıfının Kullanılmasından solayı Dependency Injection uygulanmıştır.
 
-
-
-
-
 ******************Not*****************
 
+************************************************************************************
 
+
+
+
+
+***************** GetMapping Metodu***********************
+
+******GetAllUsers*********
+localhost:8080/user/getAll  (postman) istek
+
+Öncelikle getAllUsers Metdodunu Controller içerisinde tanımladık.İnternetten gelen ilk isteğe cevap verecek olan controller da tanımlanan bu metoda GetMApping(/getAll) url sini verdik.
+getAllUsers Metdounun Generic Tipini List Dönüş Tipini User olarak verdik yani Bize user listesi dönecek.
+Daha Sonra List<User> resultUsers değişkenine userServices.getUsers() fonksiyonunu atadık. Controller ile servicesi haberleştirmiş olduk.
+userServices.GetUsers() metodunu UserServices Interface inde tanımladık.
+Tanımladığımız bu methodu bu interface i implement eden UserServicesImpl classında override ettik
+Override edilen bu methodun içinde işlem yapmadık çünkü tüm kullanıcıları koşulsuz getirmek istiyoruz.
+Bu Override edilen methodun dönüşüne Repository katmanı  ile haberleşmesi için userRepository.findAll Hazır Jpa fonksiyonunu kullandık.
+Repositoryden List User tipinde dönen sonucu json formatında geri dönüşünü sağladık.
+
+******GetAllUsers*********
+
+*********getUser**********
+localhost:8080/user/getById100  (postman) istek
+
+Öcelikle getUser methodununu tanımlıyoruz.
+GetMapping özelliğğinde url kısmında @GetMapping(/get{id}) veriyoruz.Çünkü bir kullanıcı getirmek istediğimizde o kullanıcının id si ile ona ulaşırız.
+Daha sonra     public ResponseEntity <User> getUser(@PathVariable ("id") Long id) tanımlanan method da parametre olarak  @PathVariable ("id") Long id tanımlamaısnı yapıyoruz. Bu tanımlama path den gelen id değikenini Long id parametresi ile eşletirsin anlamına geliyor.
+User userResult değişkenine is c.getUser(id); methodundan dönen User nesneisnin atıyoruz. Böylece Controller ile Services Katmanını haberleştiriyoruz.
+Daha sonra userServices ınterfacesinde User getUser(Long id) methodunu ve implemet eden UserServicesImpl Classında override ederek bu methodu tanımlıyoruz.
+UserServivesImpl Classında ovveride ettiğimiz bu methodun içinde findById methodunu kullandık. Geriye Optional döner bu nullpointerexeption hatasının düşmesini engelliyor.
+dönen sonuç Optionalde saklandığı için sonucu isPresent() ile kontrol edebiliyoruz.Yani geriye bir değer döndümü dönmdedi mi . Böylece null pointer hatasını engellemiş olduk.
+direk return userRepository.findById(id).get() dediyebilirdik fakat null pointer exeption hatasını engellemek istedik.
+
+
+*******************Not(OPTIONAL)****************
+
+Null olmayan bir değer içerebilen veya içermeyebilen bir kapsayıcı nesnesi. Bir değer varsa, isPresent() true değerini döndürür. Değer yoksa, nesne boş kabul edilir ve isPresent() false döndürür.
+orElse() (değer yoksa varsayılan bir değer döndürür) ve ifPresent() (bir değer varsa bir eylem gerçekleştirir) gibi, içerilen bir değerin varlığına veya yokluğuna bağlı olan ek yöntemler sağlanır.
+Bu, değere dayalı bir sınıftır; programcılar, eşit olan örnekleri birbirinin yerine geçebilir olarak ele almalı ve örnekleri senkronizasyon için kullanmamalıdır, aksi takdirde öngörülemeyen davranışlar ortaya çıkabilir.
+ Örneğin, gelecekteki bir sürümde senkronizasyon başarısız olabilir.
+API Notu:
+İsteğe bağlı, öncelikle "sonuç yok" ifadesinin açıkça gerekli olduğu ve boş değerin kullanılmasının hatalara neden olabileceği durumlarda bir yöntem dönüş türü olarak kullanılmak üzere tasarlanmıştır.
+Türü İsteğe bağlı olan bir değişkenin kendisi hiçbir zaman boş olmamalıdır; her zaman bir İsteğe bağlı örneğe işaret etmelidir
+
+*******************Not(OPTIONAL)*****************
+
+
+
+*********getUser**********
 
 
 

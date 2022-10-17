@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(value = "/user")
 @ResponseBody
@@ -32,6 +34,20 @@ public class UserController {
     public ResponseEntity<User> createUser(@RequestBody User user)
     {
         User resultUser=userService.createUser(user);
+        return ResponseEntity.ok(resultUser);
+    }
+
+    @GetMapping(value = "/getAll")
+    public ResponseEntity <List<User>> getUser()
+    {
+        List<User> resultUser=userService.getUsers();
+        return ResponseEntity.ok(resultUser);
+    }
+
+    @GetMapping(value = "/getById{id}")
+    public ResponseEntity <User> getUser(@PathVariable ("id") Long id)
+    {
+        User resultUser=userService.getUser(id);
         return ResponseEntity.ok(resultUser);
     }
 }
