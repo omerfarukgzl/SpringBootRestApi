@@ -36,5 +36,30 @@ public class UserServicesImpl implements UserService {
         }
         return null;
     }
+    @Override
+    public User updateUser(Long id,User user) {
+        Optional <User> finduser = userRepository.findById(id);
+        if(finduser.isPresent()) // geriye user döndümü
+        {
+            finduser.get().setFirstname(user.getFirstname());
+            finduser.get().setLastname(user.getLastname());
+            finduser.get().setUpdateAt(new Date());
+            finduser.get().setUpdateBy("Admin");
+
+            return userRepository.save(finduser.get());
+        }
+        return null;
+    }
+
+    @Override
+    public Boolean deleteUser(Long id) {
+        Optional <User> finduser = userRepository.findById(id);
+        if(finduser.isPresent()) // geriye user döndümü
+        {
+            userRepository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
 
 }

@@ -3,7 +3,7 @@ package com.Omer.Notes;
 public class Notes {
     /*
 
-***************** Entity Oluştruma **********************
+********************** Entity Oluştruma ****************************
 
 
 entity package oluşturduk ve User Classı oluşturduk(User Table)
@@ -19,10 +19,12 @@ Ortak Tablo olarak baseclass oluiturulur kim güncelledi ne zaman güncelledi vb
 Base Class ı oluşturan Annotttaion @MappedSupperClass dır
 ve Serialzable implement ediyoruz : Bu özellik nesnemiiz networken taşıma veyha diske yazıp okuma özelliği kaznaıdıruoruz;
 
+********************** Entity Oluştruma ****************************
 
 
 
-************ Katmanlar Arası Mimari *******************
+
+******************** Katmanlar Arası Mimari ************************
 
                    Client
                      ||
@@ -84,9 +86,14 @@ Daha Sonra interface leri implemente edicek classlar için servicesImpl paketi a
 Classı ımızın services olduğunu belirtmek için @Services Annotation unu ekledik.Böylece Proje ayağu kalkerken bu classın instance ı oluşturulacak ve IoC konteynırına eklenecek.
 
 
+******************** Katmanlar Arası Mimari ************************
 
 
-***************** Katmanlar Arası Bağlantı ***********************
+
+
+
+
+********************* Katmanlar Arası Bağlantı ************************
 
 ***Controller----Services**
 
@@ -104,10 +111,7 @@ Controller Katmanı Services katmanı ile konuşacağı için Controller sınıf
     }
     veya   private final UserService userService; yanlızca bunu yazarız ve @RequiredArgsContructor Annotationu ile Constructor u otomatik oluşturur.
 
-
-
 ******************Not*****************
-
 
 controllerın ustundeki
 @RequestMapping(value = "/user")
@@ -122,11 +126,18 @@ ve controller içindeki
 
 aslında .net core daki controller url si ve action url sdir  @RequestMapping(value = "/user")   ,  @PostMapping(value = "/create")
 
-
 ******************Not*****************
 
 
-***************** PostMapping Metodu***********************
+********************* Katmanlar Arası Bağlantı ************************
+
+
+
+
+
+
+
+************************ PostMapping Metodu***************************
 localhost:8080/user/create  (postman) istek
 post seçeneği seçilir
 Body Kısmı seçilir ve json formatında bilgiler yazılır.
@@ -169,13 +180,13 @@ services katmanlarında interface olmasının sebebi Controller sınıfınfa ser
 
 ******************Not*****************
 
-************************************************************************************
+************************ PostMapping Metodu****************************
 
 
 
 
 
-***************** GetMapping Metodu***********************
+********************** GetMapping Metodu*************************
 
 ******GetAllUsers*********
 localhost:8080/user/getAll  (postman) istek
@@ -191,8 +202,11 @@ Repositoryden List User tipinde dönen sonucu json formatında geri dönüşün�
 
 ******GetAllUsers*********
 
+------------------------------------------
+
 *********getUser**********
-localhost:8080/user/getById100  (postman) istek
+
+localhost:8080/user/getById/100  (postman) istek
 
 Öcelikle getUser methodununu tanımlıyoruz.
 GetMapping özelliğğinde url kısmında @GetMapping(/get{id}) veriyoruz.Çünkü bir kullanıcı getirmek istediğimizde o kullanıcının id si ile ona ulaşırız.
@@ -216,13 +230,74 @@ Türü İsteğe bağlı olan bir değişkenin kendisi hiçbir zaman boş olmamal
 
 *******************Not(OPTIONAL)*****************
 
-
-
 *********getUser**********
 
 
+********************** GetMapping Metodu*************************
 
 
+************************ PutMapping Metodu**************************
+localhost:8080/user/update/100  (postman) istek
+and json format update user
+
+
+ Öncelikle Controller da updateUser methodunu tanımladık.
+ Daha sonra bu methodun @PutMapping Kısmına updateUser{id} ekledik
+ methodun parametre kısmına path den gelen pathveraible ve guncellenmek istenen user nesnesinden json formatında gelen  @RequestBody User user parametresini ekledik
+ User resultUser değişkenine services ınterface inde olan userServices.updateUser(id,user) methodunu atadık.
+ Services ınterfaceında tanımlayıp implement eden userServicesImpl classında da override ettik
+ Bu override edilen methodda Optional tip dönen userRepository.findById(id) ile guncellenmek istenen kullanıcıyı bulduk ve isPresent() özelliğini kullanarak sonuç geldi mi gelmedimi kontrol edttik
+ Eğer sonuç olarak bir user donduyse donen user'a parametreden gelen user nesnesinin özellikleirni set ettik ve save edip geri döndük.
+
+ !!Önce get ile o satırı aldık daha sonra o satıra yeni değer setledik. Setin içine paramtreden gelen bilgiyi get ederek aldık.
+
+
+    public User updateUser(Long id,User user) {
+        Optional <User> finduser = userRepository.findById(id);
+        if(finduser.isPresent()) // geriye user döndümü
+        {
+            finduser.get().setFirstname(user.getFirstname());
+            finduser.get().setLastname(user.getLastname());
+            finduser.get().setUpdateAt(new Date());
+            finduser.get().setUpdateBy("Admin");
+
+            return userRepository.save(finduser.get());
+        }
+        return null;
+    }
+
+************************ PutMapping Metodu**************************
+
+
+************************ DeleteMapping Metodu**************************
+localhost:8080/user/delete/100
+
+
+public ResponseEntity <Boolean> deleteUser(@PathVariable ("id") Long id)
+    {
+        Boolean resultUser=userService.deleteUser(id);
+        return ResponseEntity.ok(resultUser);
+    }
+
+Öncelikle Controller da Boolean geri dönüşü olan deleteUser methodunu tanımladık.Methoda parametre olarak silinecek user ın id sinin url üzerinden @PathVeriable üzerinden atadık.
+Dönüş tipi boolean olan bir değişkende userServices.deleteUser(id) methodundan gelen sonucu sakladık.
+Services ınterfaceınde ve implement eden userServiesImpl Classında tanımlamaları yaptıktan sonra
+override edilen method içerisinde  Optional <User> finduser = userRepository.findById(id); işleviyle kullanıcıyı buldurduk.
+Eğer kullanıcı bulunduysa userRepository.deleteById(id); işleviyle gönderilen id üzerinden kullanıcıyı sildik.
+Sonucunda true geri dönüşümü sağladık.
+
+public Boolean deleteUser(Long id) {
+        Optional <User> finduser = userRepository.findById(id);
+        if(finduser.isPresent()) // geriye user döndümü
+        {
+            userRepository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
+
+
+************************ DeleteMapping Metodu**************************
 
 
   */
